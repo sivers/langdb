@@ -1,0 +1,94 @@
+#!/usr/bin/env ruby
+require 'sqlite3'
+
+# USAGE:
+# ./add word
+# This would prompt for eo then en
+
+# ./add phrase
+# This would prompt for eo then en
+
+# ./add fact
+# This would prompt for q then a
+
+# ./add word eo: ĉe
+# This would prompt for en
+
+# ./add phrase en: the dog is looking mighty fine
+# This would prompt for eo
+
+# ./add fact q: what is the difference between tio and tio ĉe?
+# This would prompt for a
+
+# ./add word eo: ĉe en: this
+# This would insert it
+
+# ./add phrase en: the dog is looking mighty fine eo: la hunda estas bela
+# This would insert it
+
+# ./add fact q: what is the difference between tio and tio ĉe? a: there vs here
+# This would insert it
+
+cmds = %w(word phrase fact)
+
+firstword = ARGV[0]
+raise "needs first word: #{cmds.join(',')}" unless cmds.include? firstword
+
+keywords = (firstword == 'fact') ? %w(q a) : %w(en eo)
+
+rest = ARGV[1..-1]
+
+class Array
+	def j
+		self.join(' ')
+	end
+	def after(i)
+		self[i + 1, self.size].j
+	end
+	def fromto(i, j)
+		self[i + 1, j - 1].j
+	end
+end
+
+def extract(keywords, allwords)
+	kw1 = keywords[0]
+	kw2 = keywords[1]
+	pos1 = allwords.index(kw1 + ':')
+	pos2 = allwords.index(kw2 + ':')
+	if (pos1.nil? && pos2.nil?)
+		{}
+	elsif (pos2.nil?)
+		{kw1 => allwords.after(pos1)}
+	elsif (pos1.nil?)
+		{kw2 => allwords.after(pos2)}
+	else
+		if (pos1 < pos2)
+			{kw1 => allwords.fromto(pos1, pos2),
+				kw2 => allwords.after(pos2)}
+		else
+			{kw1 => allwords.after(pos1),
+				kw2 => allwords.fromto(pos2, pos1)}
+		end
+	end
+end
+
+given = extract(keywords, rest)
+keywords.each do |kw|
+	if given[kw].nil?
+		print "#{kw}: "
+		given[kw] = STDIN.gets.strip
+	end
+end
+
+puts given.inspect
+
+DB = SQLite3::Database.new 'eo.db'
+case firstword
+when 'word'
+	DB.execute("INSERT INTO words(en, eo) VALUES(?, ?)", given['en'], given['eo'])
+when 'phrase'
+	DB.execute("INSERT INTO phrases(en, eo) VALUES(?, ?)", given['en'], given['eo'])
+when 'fact'
+	DB.execute("INSERT INTO facts(q, a) VALUES(?, ?)", given['q'], given['a'])
+end
+
