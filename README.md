@@ -20,6 +20,9 @@ ruby -v
 gem install sqlite3
 ```
 
+Either make sure that “.” is in your $PATH, or else add “./” in front of all commands below.
+(Example: ./add ./q ./dict ./log …)
+
 # USAGE:
 
 ## type “add” to add a word, phrase, or fact
