@@ -233,10 +233,10 @@ Feel free to use or alter it however you'd like.  It's working well for me so fa
 
 ```
 $ log sum
-55 hours and 55 minutes
+150 hours and 46 minutes
 
 $ dict
-TOTAL: 691 words, 195 phrases, 44 facts
+TOTAL: 1024 words, 333 phrases, 69 facts
 TO EXPORT: 17 words, 23 phrases, 3 facts
 ```
 
