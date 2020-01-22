@@ -7,50 +7,50 @@ firstword = ARGV[0]
 raise "needs first word: #{cmds.join(',')}" unless cmds.include? firstword
 
 def show(row)
-	puts "%s\t%d\t%s\t%s" % [
-		row[0],
-		row[3],
-		row[1].gsub("\n", ' '),
-		String(row[2]).gsub("\n", ' ')]
+  puts "%s\t%d\t%s\t%s" % [
+    row[0],
+    row[3],
+    row[1].gsub("\n", ' '),
+    String(row[2]).gsub("\n", ' ')]
 end
 
 case firstword
 when 'start'
-	rows = DB.execute("SELECT start, actions FROM log WHERE finish IS NULL")
-	if rows.size > 0
-		puts "finish this one first: %s\t%s" % [rows[0][0], rows[0][1]]
-		print "how many minutes spent on it? "
-		minutes = STDIN.gets.strip.to_i
-		DB.execute("UPDATE log SET finish = datetime(start, '+#{minutes} minutes') WHERE start = ?", rows[0][0]) 
-	else
-		print "actions? "
-		actions = STDIN.gets.strip
-		DB.execute("INSERT INTO log(start, actions) VALUES (datetime('now', 'localtime'), ?)", actions)
-		puts "OK GO"
-	end
+  rows = DB.execute("SELECT start, actions FROM log WHERE finish IS NULL")
+  if rows.size > 0
+    puts "finish this one first: %s\t%s" % [rows[0][0], rows[0][1]]
+    print "how many minutes spent on it? "
+    minutes = STDIN.gets.strip.to_i
+    DB.execute("UPDATE log SET finish = datetime(start, '+#{minutes} minutes') WHERE start = ?", rows[0][0]) 
+  else
+    print "actions? "
+    actions = STDIN.gets.strip
+    DB.execute("INSERT INTO log(start, actions) VALUES (datetime('now', 'localtime'), ?)", actions)
+    puts "OK GO"
+  end
 when 'finish'
-	rows = DB.execute("SELECT start FROM log WHERE finish IS NULL")
-	unless rows.size == 1
-		puts 'not one open log entry'
-	else
-		start = rows[0][0]
-		print "thoughts? "
-		thoughts = STDIN.gets.strip
-		if thoughts.size > 0
-			DB.execute("UPDATE log SET finish=datetime('now', 'localtime'), thoughts=? WHERE start=?", thoughts, start)
-		else
-			DB.execute("UPDATE log SET finish=datetime('now', 'localtime') WHERE start=?", start)
-		end
-		rows = DB.execute("SELECT start, actions, thoughts, (strftime('%s', finish) - strftime('%s', start)) / 60 FROM log WHERE start = ?", start)
-		show rows[0]
-	end
+  rows = DB.execute("SELECT start FROM log WHERE finish IS NULL")
+  unless rows.size == 1
+    puts 'not one open log entry'
+  else
+    start = rows[0][0]
+    print "thoughts? "
+    thoughts = STDIN.gets.strip
+    if thoughts.size > 0
+      DB.execute("UPDATE log SET finish=datetime('now', 'localtime'), thoughts=? WHERE start=?", thoughts, start)
+    else
+      DB.execute("UPDATE log SET finish=datetime('now', 'localtime') WHERE start=?", start)
+    end
+    rows = DB.execute("SELECT start, actions, thoughts, (strftime('%s', finish) - strftime('%s', start)) / 60 FROM log WHERE start = ?", start)
+    show rows[0]
+  end
 when 'show'
-	DB.execute("SELECT start, actions, thoughts, (strftime('%s', finish) - strftime('%s', start)) / 60 FROM log WHERE finish IS NOT NULL ORDER BY start").each do |row|
-		show row
-	end
+  DB.execute("SELECT start, actions, thoughts, (strftime('%s', finish) - strftime('%s', start)) / 60 FROM log WHERE finish IS NOT NULL ORDER BY start").each do |row|
+    show row
+  end
 when 'sum'
-	rows = DB.execute("SELECT (strftime('%s', finish) - strftime('%s', start)) / 60 FROM log WHERE finish IS NOT NULL")
-	minutes = rows.inject(0) {|s,e| s += e[0].to_i}
-	puts '%d hours and %d minutes' % [minutes / 60,  minutes % 60]
+  rows = DB.execute("SELECT (strftime('%s', finish) - strftime('%s', start)) / 60 FROM log WHERE finish IS NOT NULL")
+  minutes = rows.inject(0) {|s,e| s += e[0].to_i}
+  puts '%d hours and %d minutes' % [minutes / 60,  minutes % 60]
 end
 

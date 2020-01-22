@@ -39,45 +39,45 @@ keywords = (firstword == 'fact') ? %w(q a) : %w(en eo)
 rest = ARGV[1..-1]
 
 class Array
-	def j
-		self.join(' ')
-	end
-	def after(i)
-		self[i + 1, self.size].j
-	end
-	def fromto(i, j)
-		self[i + 1, j - 1].j
-	end
+  def j
+    self.join(' ')
+  end
+  def after(i)
+    self[i + 1, self.size].j
+  end
+  def fromto(i, j)
+    self[i + 1, j - 1].j
+  end
 end
 
 def extract(keywords, allwords)
-	kw1 = keywords[0]
-	kw2 = keywords[1]
-	pos1 = allwords.index(kw1 + ':')
-	pos2 = allwords.index(kw2 + ':')
-	if (pos1.nil? && pos2.nil?)
-		{}
-	elsif (pos2.nil?)
-		{kw1 => allwords.after(pos1)}
-	elsif (pos1.nil?)
-		{kw2 => allwords.after(pos2)}
-	else
-		if (pos1 < pos2)
-			{kw1 => allwords.fromto(pos1, pos2),
-				kw2 => allwords.after(pos2)}
-		else
-			{kw1 => allwords.after(pos1),
-				kw2 => allwords.fromto(pos2, pos1)}
-		end
-	end
+  kw1 = keywords[0]
+  kw2 = keywords[1]
+  pos1 = allwords.index(kw1 + ':')
+  pos2 = allwords.index(kw2 + ':')
+  if (pos1.nil? && pos2.nil?)
+    {}
+  elsif (pos2.nil?)
+    {kw1 => allwords.after(pos1)}
+  elsif (pos1.nil?)
+    {kw2 => allwords.after(pos2)}
+  else
+    if (pos1 < pos2)
+      {kw1 => allwords.fromto(pos1, pos2),
+        kw2 => allwords.after(pos2)}
+    else
+      {kw1 => allwords.after(pos1),
+        kw2 => allwords.fromto(pos2, pos1)}
+    end
+  end
 end
 
 given = extract(keywords, rest)
 keywords.each do |kw|
-	if given[kw].nil?
-		print "#{kw}: "
-		given[kw] = STDIN.gets.strip
-	end
+  if given[kw].nil?
+    print "#{kw}: "
+    given[kw] = STDIN.gets.strip
+  end
 end
 
 puts given.inspect
@@ -85,10 +85,10 @@ puts given.inspect
 DB = SQLite3::Database.new 'eo.db'
 case firstword
 when 'word'
-	DB.execute("INSERT INTO words(en, eo) VALUES(?, ?)", given['en'], given['eo'])
+  DB.execute("INSERT INTO words(en, eo) VALUES(?, ?)", given['en'], given['eo'])
 when 'phrase'
-	DB.execute("INSERT INTO phrases(en, eo) VALUES(?, ?)", given['en'], given['eo'])
+  DB.execute("INSERT INTO phrases(en, eo) VALUES(?, ?)", given['en'], given['eo'])
 when 'fact'
-	DB.execute("INSERT INTO facts(q, a) VALUES(?, ?)", given['q'], given['a'])
+  DB.execute("INSERT INTO facts(q, a) VALUES(?, ?)", given['q'], given['a'])
 end
 
