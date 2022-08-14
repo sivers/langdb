@@ -1,11 +1,10 @@
 #!/usr/bin/env ruby
 require 'sqlite3'
-# https://github.com/sparklemotion/sqlite3-ruby/blob/master/faq/faq.yml
 
 DB = SQLite3::Database.new 'eo.db'
 
-WORDS = "SELECT en, eo FROM words WHERE en LIKE ? OR eo LIKE ? ORDER BY eo"
-PHRASES = "SELECT en, eo FROM phrases WHERE en LIKE ? OR eo LIKE ? ORDER BY eo"
+WORDS = "select en, eo from words where en like ? or eo like ? order by eo"
+PHRASES = "select en, eo from phrases where en like ? or eo like ? order by eo"
 
 def wild(txt)
   '%' + txt.strip + '%'

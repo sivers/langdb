@@ -16,20 +16,20 @@ end
 
 case firstword
 when 'start'
-  rows = DB.execute("SELECT start, actions FROM log WHERE finish IS NULL")
+  rows = DB.execute("select start, actions from log where finish is null")
   if rows.size > 0
     puts "finish this one first: %s\t%s" % [rows[0][0], rows[0][1]]
     print "how many minutes spent on it? "
     minutes = STDIN.gets.strip.to_i
-    DB.execute("UPDATE log SET finish = datetime(start, '+#{minutes} minutes') WHERE start = ?", rows[0][0]) 
+    DB.execute("update log set finish = datetime(start, '+#{minutes} minutes') where start = ?", rows[0][0]) 
   else
     print "actions? "
     actions = STDIN.gets.strip
-    DB.execute("INSERT INTO log(start, actions) VALUES (datetime('now', 'localtime'), ?)", actions)
+    DB.execute("insert into log(start, actions) values (datetime('now', 'localtime'), ?)", actions)
     puts "OK GO"
   end
 when 'finish'
-  rows = DB.execute("SELECT start FROM log WHERE finish IS NULL")
+  rows = DB.execute("select start from log where finish is null")
   unless rows.size == 1
     puts 'not one open log entry'
   else
@@ -37,19 +37,19 @@ when 'finish'
     print "thoughts? "
     thoughts = STDIN.gets.strip
     if thoughts.size > 0
-      DB.execute("UPDATE log SET finish=datetime('now', 'localtime'), thoughts=? WHERE start=?", thoughts, start)
+      DB.execute("update log set finish=datetime('now', 'localtime'), thoughts=? where start=?", thoughts, start)
     else
-      DB.execute("UPDATE log SET finish=datetime('now', 'localtime') WHERE start=?", start)
+      DB.execute("update log set finish=datetime('now', 'localtime') where start=?", start)
     end
-    rows = DB.execute("SELECT start, actions, thoughts, (strftime('%s', finish) - strftime('%s', start)) / 60 FROM log WHERE start = ?", start)
+    rows = DB.execute("select start, actions, thoughts, (strftime('%s', finish) - strftime('%s', start)) / 60 from log where start = ?", start)
     show rows[0]
   end
 when 'show'
-  DB.execute("SELECT start, actions, thoughts, (strftime('%s', finish) - strftime('%s', start)) / 60 FROM log WHERE finish IS NOT NULL ORDER BY start").each do |row|
+  DB.execute("select start, actions, thoughts, (strftime('%s', finish) - strftime('%s', start)) / 60 from log where finish is not null order by start").each do |row|
     show row
   end
 when 'sum'
-  rows = DB.execute("SELECT (strftime('%s', finish) - strftime('%s', start)) / 60 FROM log WHERE finish IS NOT NULL")
+  rows = DB.execute("select (strftime('%s', finish) - strftime('%s', start)) / 60 from log where finish is not null")
   minutes = rows.inject(0) {|s,e| s += e[0].to_i}
   puts '%d hours and %d minutes' % [minutes / 60,  minutes % 60]
 end

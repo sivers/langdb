@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 require 'sqlite3'
-DB = SQLite3::Database.new 'eo.db'
+DB = SQLite3::Database.new('eo.db')
 
 module Word
   class << self

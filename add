@@ -85,10 +85,10 @@ puts given.inspect
 DB = SQLite3::Database.new 'eo.db'
 case firstword
 when 'word'
-  DB.execute("INSERT INTO words(en, eo) VALUES(?, ?)", given['en'], given['eo'])
+  DB.execute("insert into words(en, eo) values(?, ?)", given['en'], given['eo'])
 when 'phrase'
-  DB.execute("INSERT INTO phrases(en, eo) VALUES(?, ?)", given['en'], given['eo'])
+  DB.execute("insert into phrases(en, eo) values(?, ?)", given['en'], given['eo'])
 when 'fact'
-  DB.execute("INSERT INTO facts(q, a) VALUES(?, ?)", given['q'], given['a'])
+  DB.execute("insert into facts(q, a) values(?, ?)", given['q'], given['a'])
 end
 

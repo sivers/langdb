@@ -1,22 +1,22 @@
-CREATE TABLE words (
+create table words (
 	id integer primary key,
 	en text unique,
 	eo text unique,
 	exported integer not null default 0
 );
-CREATE TABLE phrases (
+create table phrases (
 	id integer primary key,
 	en text unique,
 	eo text unique,
 	exported integer not null default 0
 );
-CREATE TABLE facts (
+create table facts (
 	id integer primary key,
 	q text unique,
 	a text unique,
 	exported integer not null default 0
 );
-CREATE TABLE log (
+create table log (
 	start text primary key,
 	actions text,
 	thoughts text,

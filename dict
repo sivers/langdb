@@ -3,15 +3,15 @@ require 'sqlite3'
 DB = SQLite3::Database.new 'eo.db'
 
 puts "TOTAL: %d words, %d phrases, %d facts" % [
-  DB.get_first_value("SELECT COUNT(*) FROM words"),
-  DB.get_first_value("SELECT COUNT(*) FROM phrases"),
-  DB.get_first_value("SELECT COUNT(*) FROM facts")
+  DB.get_first_value("select count(*) from words"),
+  DB.get_first_value("select count(*) from phrases"),
+  DB.get_first_value("select count(*) from facts")
 ]
 
 puts "TO EXPORT: %d words, %d phrases, %d facts" % [
-  DB.get_first_value("SELECT COUNT(*) FROM words WHERE exported=0"),
-  DB.get_first_value("SELECT COUNT(*) FROM phrases WHERE exported=0"),
-  DB.get_first_value("SELECT COUNT(*) FROM facts WHERE exported=0")
+  DB.get_first_value("select count(*) from words where exported=0"),
+  DB.get_first_value("select count(*) from phrases where exported=0"),
+  DB.get_first_value("select count(*) from facts where exported=0")
 ]
 
 exit unless ARGV[0] == 'export'
@@ -27,29 +27,29 @@ def add2anki(q, a)
   end
 end
 
-DB.execute("SELECT en, eo FROM words WHERE exported=0 ORDER BY id") do |row|
+DB.execute("select en, eo from words where exported=0 order by id") do |row|
   add2anki("WORD:\n#{row[0]}", row[1])
   add2anki(row[1], row[0])
 end
-DB.execute("UPDATE words SET exported=2 WHERE exported=0")
+DB.execute("update words set exported=2 where exported=0")
 
-DB.execute("SELECT en, eo FROM phrases WHERE exported=0 ORDER BY id") do |row|
+DB.execute("select en, eo from phrases where exported=0 order by id") do |row|
   add2anki("PHRASE:\n#{row[0]}", row[1])
   add2anki(row[1], row[0])
 end
-DB.execute("UPDATE phrases SET exported=2 WHERE exported=0")
+DB.execute("update phrases set exported=2 where exported=0")
 
-DB.execute("SELECT q, a FROM facts WHERE exported=0 ORDER BY id") do |row|
+DB.execute("select q, a from facts where exported=0 order by id") do |row|
   add2anki(row[0], row[1])
   add2anki(row[1], row[0])
 end
-DB.execute("UPDATE facts SET exported=2 WHERE exported=0")
+DB.execute("update facts set exported=2 where exported=0")
 
 puts "Go import #{OUTFILE}."
 print "TYPE ok WHEN DONE: "
 raise 'go update sqlite manually' unless 'ok' == STDIN.gets.strip
-DB.execute("UPDATE words SET exported=1 WHERE exported=2")
-DB.execute("UPDATE phrases SET exported=1 WHERE exported=2")
-DB.execute("UPDATE facts SET exported=1 WHERE exported=2")
+DB.execute("update words set exported=1 where exported=2")
+DB.execute("update phrases set exported=1 where exported=2")
+DB.execute("update facts set exported=1 where exported=2")
 puts "DONE."
 
